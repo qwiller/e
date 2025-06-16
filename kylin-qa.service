@@ -1,0 +1,20 @@
+[Unit]
+Description=银河麒麟智能问答助手
+After=network.target
+
+[Service]
+Type=simple
+User=kylin
+WorkingDirectory=/opt/kylin-qa-assistant
+ExecStart=/usr/bin/python3 /opt/kylin-qa-assistant/main.py
+Restart=always
+RestartSec=10
+Environment=PYTHONPATH=/opt/kylin-qa-assistant/src
+
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kylin-qa
+
+[Install]
+WantedBy=multi-user.target

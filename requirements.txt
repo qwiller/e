@@ -1,0 +1,40 @@
+# 银河麒麟智能问答助手 - 依赖配置文件
+# 针对中国大陆网络环境优化，使用国内镜像源
+
+# Web框架
+requests==2.31.0
+
+# 数据处理 - 麒麟系统兼容版本
+numpy==1.24.3
+scikit-learn==1.3.0  # TF-IDF向量化
+
+# 文档处理
+PyPDF2==3.0.1
+python-docx==0.8.11
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# 系统和工具
+psutil==5.9.6
+
+# GUI增强
+Pillow==10.0.1
+
+# 网络和API
+httpx==0.25.2
+
+# 语音功能
+SpeechRecognition==3.10.0
+pyttsx3==2.90
+
+# 国内镜像源配置说明：
+# 安装时使用：pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r requirements.txt
+# 或者：pip3 install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+# 麒麟系统特定依赖
+# 这些包将通过系统包管理器安装，不通过pip
+# python3-dev, python3-pyaudio, portaudio19-dev
+# libkysdk-* 系列包
+
+# 配置和日志
+pyyaml==6.0.1
+loguru==0.7.2
