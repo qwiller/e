@@ -29,27 +29,68 @@ class RAGEngine:
             self.logger.warning(f"系统信息助手初始化失败: {e}")
             self.system_helper = None
     
-    def add_documents(self, file_paths: List[str]):
+    def add_document(self, file_path: str) -> Dict[str, Any]:
         """
-        添加文档到知识库
-        
+        添加单个文档到知识库
+
+        Args:
+            file_path: 文档文件路径
+
+        Returns:
+            处理结果
+        """
+        try:
+            self.logger.info(f"处理文档: {file_path}")
+
+            # 处理文档
+            chunks = self.document_processor.process_file(file_path)
+
+            if chunks:
+                # 添加到向量存储
+                self.vector_store.add_documents(chunks)
+
+                result = {
+                    'success': True,
+                    'file_path': file_path,
+                    'document_count': len(chunks),
+                    'message': f'成功添加 {len(chunks)} 个文档块'
+                }
+
+                self.logger.info(f"成功添加 {len(chunks)} 个文档块到知识库")
+                return result
+            else:
+                return {
+                    'success': False,
+                    'file_path': file_path,
+                    'document_count': 0,
+                    'message': '文档处理失败，未生成有效内容'
+                }
+
+        except Exception as e:
+            self.logger.error(f"添加文档失败: {str(e)}")
+            return {
+                'success': False,
+                'file_path': file_path,
+                'document_count': 0,
+                'message': f'处理失败: {str(e)}'
+            }
+
+    def add_documents(self, file_paths: List[str]) -> List[Dict[str, Any]]:
+        """
+        批量添加文档到知识库
+
         Args:
             file_paths: 文档文件路径列表
+
+        Returns:
+            处理结果列表
         """
-        all_chunks = []
-        
+        results = []
         for file_path in file_paths:
-            try:
-                self.logger.info(f"处理文档: {file_path}")
-                chunks = self.document_processor.process_file(file_path)
-                all_chunks.extend(chunks)
-                
-            except Exception as e:
-                self.logger.error(f"处理文档 {file_path} 失败: {str(e)}")
-        
-        if all_chunks:
-            self.vector_store.add_documents(all_chunks)
-            self.logger.info(f"成功添加 {len(all_chunks)} 个文档块到知识库")
+            result = self.add_document(file_path)
+            results.append(result)
+
+        return results
     
     def query(self, question: str, include_system_info: bool = False) -> Dict[str, Any]:
         """

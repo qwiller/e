@@ -110,16 +110,19 @@ def main():
     """
     print("🎨 创建应用图标")
     print("=" * 30)
-    
+
     try:
         # 尝试使用PIL创建图标
-        import PIL
         create_app_icon()
         create_microphone_icon()
+        print("🎉 图标创建完成！")
     except ImportError:
         print("⚠️  PIL未安装，创建简单图标")
         create_simple_icons()
         print("提示：安装PIL可以创建更好的图标: pip install Pillow")
+    except Exception as e:
+        print(f"❌ 图标创建失败: {e}")
+        create_simple_icons()
 
 if __name__ == "__main__":
     main()

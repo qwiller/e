@@ -66,14 +66,20 @@ elif [ -f "./data/vector_db" ]; then
     echo -e "${GREEN}✅ 向量存储路径已修复${NC}"
 fi
 
-# 检查是否需要修复
-if [ ! -f "assets/app_icon.png" ] || [ ! -f "./data/vector_db/.gitkeep" ]; then
-    echo -e "${YELLOW}⚠️  检测到可能的问题，建议运行修复脚本${NC}"
-    read -p "是否现在运行修复脚本？(y/N): " -n 1 -r
+# 检查系统状态
+if [ ! -d "./data/vector_db" ]; then
+    echo -e "${YELLOW}⚠️  首次运行，创建必要目录...${NC}"
+    mkdir -p ./data/vector_db
+    mkdir -p ./logs
+    mkdir -p ./assets
+fi
+
+# 可选：运行系统测试
+read -p "是否运行系统测试？(y/N): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    python3 test_system.py
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        python3 fix_all_issues.py
-    fi
 fi
 
 # 启动应用
