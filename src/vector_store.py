@@ -35,7 +35,9 @@ class VectorStore:
         self.is_fitted = False
         
         # 创建存储目录
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir:  # 确保目录路径不为空
+            os.makedirs(db_dir, exist_ok=True)
         
         # 尝试加载已有数据
         self.load()

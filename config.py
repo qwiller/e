@@ -44,7 +44,7 @@ SYSTEM_SETTINGS = {
 
 # 文档路径配置
 DOCUMENT_PATH = "./docs"
-VECTOR_DB_PATH = "./data/vector_db"
+VECTOR_DB_PATH = "./data/vector_db/vectors.pkl"
 
 # 检测系统架构
 ARCH = platform.machine().lower()
