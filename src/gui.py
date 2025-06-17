@@ -186,6 +186,7 @@ class KylinQAApp:
                     self.rag_engine.add_documents(list(file_paths))
                     self.root.after(0, lambda: self.status_label.config(text="文档添加完成"))
                     self.root.after(0, self.update_knowledge_base_status)
+                    self.root.after(0, self.update_document_list)  # 添加这行
                 except Exception as e:
                     self.root.after(0, lambda: messagebox.showerror("错误", f"添加文档失败: {str(e)}"))
                     self.root.after(0, lambda: self.status_label.config(text="就绪"))
@@ -330,6 +331,7 @@ class KylinQAApp:
             try:
                 self.rag_engine.clear_knowledge_base()
                 self.update_knowledge_base_status()
+                self.update_document_list()  # 添加这行
                 messagebox.showinfo("成功", "知识库已清空")
             except Exception as e:
                 messagebox.showerror("错误", f"清空知识库失败: {str(e)}")
@@ -357,21 +359,29 @@ class KylinQAApp:
             stats = self.rag_engine.get_knowledge_base_stats()
             documents = stats.get('documents', [])
 
+            self.logger.info(f"更新文档列表: 获取到 {len(documents)} 个文档")
+
             if documents:
-                for doc in documents:
+                for i, doc in enumerate(documents):
                     # 显示文档名称
                     doc_name = doc.get('source', '未知文档')
+                    self.logger.debug(f"文档 {i}: 原始路径 = {doc_name}")
+
                     if isinstance(doc_name, str) and '/' in doc_name:
                         doc_name = doc_name.split('/')[-1]  # 只显示文件名
                     elif isinstance(doc_name, str) and '\\' in doc_name:
                         doc_name = doc_name.split('\\')[-1]  # Windows路径
 
                     self.doc_listbox.insert(tk.END, doc_name)
+                    self.logger.debug(f"添加到列表: {doc_name}")
             else:
                 self.doc_listbox.insert(tk.END, "暂无文档")
+                self.logger.warning("知识库中没有找到文档")
 
         except Exception as e:
             self.logger.error(f"更新文档列表失败: {e}")
+            import traceback
+            self.logger.error(f"详细错误: {traceback.format_exc()}")
             self.doc_listbox.delete(0, tk.END)
             self.doc_listbox.insert(tk.END, "获取文档列表失败")
     
