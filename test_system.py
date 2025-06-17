@@ -17,12 +17,12 @@ def test_core_modules():
     print("🧪 测试核心模块...")
     
     modules = [
-        ('RAG引擎', 'src.rag_engine', 'RAGEngine'),
-        ('向量存储', 'src.vector_store', 'VectorStore'),
-        ('文档处理器', 'src.document_processor', 'DocumentProcessor'),
-        ('AI模型', 'src.ai_models', 'SiliconFlowAPI'),
-        ('语音处理', 'src.voice_handler', 'VoiceHandler'),
-        ('GUI界面', 'src.gui', 'RAGApplication')
+        ('RAG引擎', 'rag_engine', 'RAGEngine'),
+        ('向量存储', 'vector_store', 'VectorStore'),
+        ('文档处理器', 'document_processor', 'DocumentProcessor'),
+        ('AI模型', 'ai_models', 'SiliconFlowAPI'),
+        ('语音处理', 'voice_handler', 'VoiceHandler'),
+        ('GUI界面', 'gui', 'RAGApplication')
     ]
     
     results = {}
@@ -46,7 +46,7 @@ def test_rag_functionality():
     print("\n🧠 测试RAG功能...")
     
     try:
-        from src.rag_engine import RAGEngine
+        from rag_engine import RAGEngine
         
         rag = RAGEngine()
         print("✅ RAG引擎初始化成功")
@@ -87,7 +87,7 @@ def test_api_connection():
     print("\n🌐 测试API连接...")
     
     try:
-        from src.ai_models import SiliconFlowAPI
+        from ai_models import SiliconFlowAPI
         
         api = SiliconFlowAPI()
         print("✅ API客户端初始化成功")

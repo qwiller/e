@@ -90,4 +90,9 @@ echo
 export DISPLAY=${DISPLAY:-:0.0}
 
 # 启动主程序
-python3 main.py
+if [ -f "main.py" ]; then
+    python3 main.py
+else
+    echo -e "${RED}❌ main.py 文件不存在${NC}"
+    exit 1
+fi
