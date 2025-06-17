@@ -183,8 +183,12 @@ mkdir -p logs data/vector_db docs assets
 echo "   ⚙️ 检查配置文件..."
 if [ -f "config.py" ]; then
     print_success "配置文件已存在"
+elif [ -f "config_template.py" ]; then
+    print_info "从模板创建配置文件..."
+    cp config_template.py config.py
+    print_success "配置文件创建完成"
 else
-    print_warning "配置文件不存在，请确保在项目根目录运行此脚本"
+    print_warning "配置文件和模板都不存在，请检查项目完整性"
 fi
 
 print_success "目录和配置创建完成"

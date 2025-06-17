@@ -36,8 +36,9 @@ logs/
 *.log
 *.db
 
-# Configuration
-config.py
+# Configuration (exclude local config, keep template)
+config_local.py
+.env
 
 # OS generated files
 .DS_Store
