@@ -66,6 +66,16 @@ elif [ -f "./data/vector_db" ]; then
     echo -e "${GREEN}✅ 向量存储路径已修复${NC}"
 fi
 
+# 检查是否需要修复
+if [ ! -f "assets/app_icon.png" ] || [ ! -f "./data/vector_db/.gitkeep" ]; then
+    echo -e "${YELLOW}⚠️  检测到可能的问题，建议运行修复脚本${NC}"
+    read -p "是否现在运行修复脚本？(y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        python3 fix_all_issues.py
+    fi
+fi
+
 # 启动应用
 echo -e "${GREEN}🚀 启动银河麒麟智能问答助手...${NC}"
 echo

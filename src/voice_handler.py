@@ -189,15 +189,28 @@ class VoiceHandler:
         try:
             self.is_speaking = True
             self.logger.info(f"开始播报: {text[:50]}...")
-            
+
+            # 检查音频设备
+            self.logger.debug(f"TTS引擎状态: {self.tts_engine}")
+            self.logger.debug(f"音量设置: {self.tts_engine.getProperty('volume')}")
+            self.logger.debug(f"语音速度: {self.tts_engine.getProperty('rate')}")
+
+            # 确保音量不为0
+            current_volume = self.tts_engine.getProperty('volume')
+            if current_volume < 0.1:
+                self.tts_engine.setProperty('volume', 0.8)
+                self.logger.info("音量过低，已调整到0.8")
+
             self.tts_engine.say(text)
             self.tts_engine.runAndWait()
-            
+
             self.logger.info("语音播报完成")
             return True
-            
+
         except Exception as e:
             self.logger.error(f"语音播报执行失败: {e}")
+            import traceback
+            self.logger.error(f"详细错误: {traceback.format_exc()}")
             return False
         finally:
             self.is_speaking = False

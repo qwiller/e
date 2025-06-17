@@ -12,7 +12,7 @@ APP_NAME = "银河麒麟智能问答助手"
 APP_DESCRIPTION = "基于硅基流动API和麒麟SDK2.5的智能问答系统"
 
 # 硅基流动 API 配置
-SILICONFLOW_API_KEY = "sk-owsayozifrzvaxuxvyvywmyzcceokwatdbolevdnfnbwlurp"
+SILICONFLOW_API_KEY = "sk-owsayozifrzvaxuxvyvywmyzcceokwatdbolevdnfnbwlurp"  # 调试用API密钥
 SILICONFLOW_API_ENDPOINT = "https://api.siliconflow.cn/v1/chat/completions"
 
 # 默认模型配置
@@ -108,7 +108,7 @@ GUI_CONFIG = {
     "theme": "default",
     "font_family": "SimHei",
     "font_size": 12,
-    "icon_path": "./assets/icon.png"
+    "icon_path": "./assets/app_icon.png"
 }
 
 # 日志配置

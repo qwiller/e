@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 import threading
 import logging
+import os
 from typing import List
 from pathlib import Path
 
@@ -109,8 +110,16 @@ class KylinQAApp:
         self.question_entry.bind('<Return>', lambda e: self.ask_question())
 
         # 语音输入按钮
-        voice_btn = ttk.Button(input_frame, text="🎤", command=self.voice_input)
-        voice_btn.grid(row=0, column=1, padx=(0, 5))
+        self.voice_btn = ttk.Button(input_frame, text="🎤 语音", command=self.voice_input)
+        self.voice_btn.grid(row=0, column=1, padx=(0, 5))
+
+        # 尝试加载麦克风图标
+        try:
+            if os.path.exists("assets/microphone_icon.png"):
+                # 如果有图标文件，可以在这里加载
+                pass
+        except:
+            pass
 
         ttk.Button(input_frame, text="提问", command=self.ask_question).grid(row=0, column=2)
         
@@ -141,10 +150,20 @@ class KylinQAApp:
         self.status_label = ttk.Label(status_frame, text="就绪")
         self.status_label.grid(row=0, column=0, sticky=tk.W)
         
-        ttk.Button(status_frame, text="系统信息", command=self.show_system_info).grid(row=0, column=1, padx=(5, 0))
-        
+        ttk.Button(status_frame, text="📁 添加文档", command=self.add_documents).grid(row=0, column=1, padx=(5, 0))
+        ttk.Button(status_frame, text="🗑️ 清空知识库", command=self.clear_knowledge_base).grid(row=0, column=2, padx=(5, 0))
+        ttk.Button(status_frame, text="🖥️ 系统信息", command=self.show_system_info).grid(row=0, column=3, padx=(5, 0))
+
+        # 知识库文档列表
+        doc_list_frame = ttk.LabelFrame(main_frame, text="📋 知识库文档", padding="5")
+        doc_list_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(10, 0))
+
+        self.doc_listbox = tk.Listbox(doc_list_frame, height=3, font=("Arial", 9))
+        self.doc_listbox.pack(fill=tk.BOTH, expand=True)
+
         # 更新知识库状态
         self.update_knowledge_base_status()
+        self.update_document_list()
     
     def add_documents(self):
         """
@@ -322,9 +341,39 @@ class KylinQAApp:
         try:
             stats = self.rag_engine.get_knowledge_base_stats()
             doc_count = stats.get('document_count', 0)
-            self.doc_status_label.config(text=f"知识库状态: {doc_count} 个文档")
+            self.status_label.config(text=f"知识库: {doc_count} 个文档")
         except Exception as e:
-            self.doc_status_label.config(text="知识库状态: 获取失败")
+            self.status_label.config(text="知识库状态: 获取失败")
+
+    def update_document_list(self):
+        """
+        更新文档列表显示
+        """
+        try:
+            # 清空列表
+            self.doc_listbox.delete(0, tk.END)
+
+            # 获取知识库中的文档
+            stats = self.rag_engine.get_knowledge_base_stats()
+            documents = stats.get('documents', [])
+
+            if documents:
+                for doc in documents:
+                    # 显示文档名称
+                    doc_name = doc.get('source', '未知文档')
+                    if isinstance(doc_name, str) and '/' in doc_name:
+                        doc_name = doc_name.split('/')[-1]  # 只显示文件名
+                    elif isinstance(doc_name, str) and '\\' in doc_name:
+                        doc_name = doc_name.split('\\')[-1]  # Windows路径
+
+                    self.doc_listbox.insert(tk.END, doc_name)
+            else:
+                self.doc_listbox.insert(tk.END, "暂无文档")
+
+        except Exception as e:
+            self.logger.error(f"更新文档列表失败: {e}")
+            self.doc_listbox.delete(0, tk.END)
+            self.doc_listbox.insert(tk.END, "获取文档列表失败")
     
     def run(self):
         """

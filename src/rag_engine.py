@@ -154,7 +154,22 @@ class RAGEngine:
         """
         获取知识库统计信息
         """
-        return self.vector_store.get_stats()
+        stats = self.vector_store.get_stats()
+
+        # 添加文档详细信息
+        if hasattr(self.vector_store, 'documents') and self.vector_store.documents:
+            stats['documents'] = []
+            for doc in self.vector_store.documents:
+                doc_info = {
+                    'source': doc.get('source', '未知'),
+                    'content_length': len(doc.get('content', '')),
+                    'metadata': doc.get('metadata', {})
+                }
+                stats['documents'].append(doc_info)
+        else:
+            stats['documents'] = []
+
+        return stats
     
     def clear_knowledge_base(self):
         """
