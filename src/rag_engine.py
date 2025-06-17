@@ -67,12 +67,19 @@ class RAGEngine:
             
             # 检索相关文档
             relevant_docs = self.vector_store.search(
-                question, 
+                question,
                 top_k=RAG_CONFIG.get('top_k', 5)
             )
-            
+
+            self.logger.info(f"检索到 {len(relevant_docs)} 个相关文档")
+            for i, doc in enumerate(relevant_docs):
+                self.logger.info(f"文档 {i+1}: 相似度 {doc.get('similarity', 0):.4f}, 内容: {doc.get('content', '')[:100]}...")
+
             # 构建上下文
             context = self._build_context(relevant_docs, include_system_info)
+            self.logger.info(f"构建的上下文长度: {len(context)} 字符")
+            if context:
+                self.logger.debug(f"上下文内容: {context[:200]}...")
             
             # 生成回答
             answer = self.ai_model.generate_answer(question, context)

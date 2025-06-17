@@ -44,7 +44,7 @@ SYSTEM_SETTINGS = {
 
 # 文档路径配置
 DOCUMENT_PATH = "./docs"
-VECTOR_DB_PATH = "./data/vector_db"
+VECTOR_DB_PATH = "./data/vector_db/vectors.pkl"
 
 # 检测系统架构
 ARCH = platform.machine().lower()
@@ -125,7 +125,7 @@ VECTOR_CONFIG = {
     "chunk_size": 500,
     "chunk_overlap": 50,
     "embedding_model": "tfidf",  # 使用TF-IDF替代OpenAI嵌入
-    "similarity_threshold": 0.1,  # 降低阈值适应TF-IDF
+    "similarity_threshold": 0.01,  # 进一步降低阈值以提高召回率
     "max_results": 10,
     "max_features": 5000,  # TF-IDF特征数量
     "ngram_range": [1, 2]  # N-gram范围

@@ -55,6 +55,17 @@ fi
 # 检查必要目录
 mkdir -p logs data/vector_db docs
 
+# 检查向量存储配置
+echo -e "${BLUE}🔍 检查向量存储配置...${NC}"
+if [ -d "./data/vector_db" ] && [ ! -f "./data/vector_db/vectors.pkl" ]; then
+    echo -e "${GREEN}✅ 向量存储目录结构正确${NC}"
+elif [ -f "./data/vector_db" ]; then
+    echo -e "${YELLOW}⚠️  检测到向量存储路径问题，正在修复...${NC}"
+    rm -f "./data/vector_db"
+    mkdir -p "./data/vector_db"
+    echo -e "${GREEN}✅ 向量存储路径已修复${NC}"
+fi
+
 # 启动应用
 echo -e "${GREEN}🚀 启动银河麒麟智能问答助手...${NC}"
 echo

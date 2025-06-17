@@ -35,7 +35,9 @@ class VectorStore:
         self.is_fitted = False
         
         # 创建存储目录
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir:  # 确保目录路径不为空
+            os.makedirs(db_dir, exist_ok=True)
         
         # 尝试加载已有数据
         self.load()
@@ -90,24 +92,34 @@ class VectorStore:
         try:
             top_k = top_k or VECTOR_CONFIG.get('max_results', 10)
             threshold = VECTOR_CONFIG.get('similarity_threshold', 0.1)
-            
+
+            self.logger.debug(f"搜索参数: top_k={top_k}, threshold={threshold}")
+            self.logger.debug(f"文档数量: {len(self.documents)}, 向量形状: {self.vectors.shape if self.vectors is not None else None}")
+
             # 向量化查询
             query_vector = self.vectorizer.transform([query])
-            
+            self.logger.debug(f"查询向量形状: {query_vector.shape}")
+
             # 计算相似度
             similarities = cosine_similarity(query_vector, self.vectors).flatten()
-            
+            self.logger.debug(f"相似度分数: {similarities}")
+
             # 获取最相似的文档索引
             top_indices = np.argsort(similarities)[::-1][:top_k]
-            
+            self.logger.debug(f"Top {top_k} 索引: {top_indices}")
+
             results = []
             for idx in top_indices:
                 similarity = similarities[idx]
+                self.logger.debug(f"文档 {idx}: 相似度 {similarity:.4f}, 阈值 {threshold}")
                 if similarity >= threshold:
                     doc = self.documents[idx].copy()
                     doc['similarity'] = float(similarity)
                     results.append(doc)
-            
+                    self.logger.debug(f"添加文档 {idx} 到结果: {doc.get('content', '')[:100]}...")
+                else:
+                    self.logger.debug(f"文档 {idx} 相似度 {similarity:.4f} 低于阈值 {threshold}")
+
             self.logger.info(f"查询 '{query}' 返回 {len(results)} 个结果")
             return results
             
