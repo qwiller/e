@@ -78,7 +78,7 @@ class RAGApplication:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(1, weight=1)
-        main_frame.rowconfigure(2, weight=1)
+        main_frame.rowconfigure(3, weight=1)
         
         # 标题
         title_label = ttk.Label(main_frame, text="银河麒麟智能问答助手", 
@@ -86,29 +86,44 @@ class RAGApplication:
         title_label.grid(row=0, column=0, columnspan=3, pady=(0, 20))
         
         # 文档管理区域
-        doc_frame = ttk.LabelFrame(main_frame, text="📚 文档管理", padding="5")
+        doc_frame = ttk.LabelFrame(main_frame, text="📚 文档管理", padding="10")
         doc_frame.grid(row=1, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
         doc_frame.columnconfigure(1, weight=1)
-        
-        ttk.Button(doc_frame, text="📁 添加文档", command=self.add_documents).grid(row=0, column=0, padx=(0, 5))
-        
-        self.doc_status_label = ttk.Label(doc_frame, text="知识库状态: 未加载")
-        self.doc_status_label.grid(row=0, column=1, sticky=tk.W, padx=(5, 0))
-        
-        ttk.Button(doc_frame, text="🗑️ 清空知识库", command=self.clear_knowledge_base).grid(row=0, column=2, padx=(5, 0))
-        
+
+        # 文档操作按钮行
+        doc_buttons_frame = ttk.Frame(doc_frame)
+        doc_buttons_frame.grid(row=0, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 5))
+        doc_buttons_frame.columnconfigure(1, weight=1)
+
+        ttk.Button(doc_buttons_frame, text="📁 添加文档", command=self.add_documents).grid(row=0, column=0, padx=(0, 10))
+
+        self.doc_status_label = ttk.Label(doc_buttons_frame, text="知识库状态: 未加载")
+        self.doc_status_label.grid(row=0, column=1, sticky=tk.W, padx=(10, 10))
+
+        ttk.Button(doc_buttons_frame, text="🗑️ 清空知识库", command=self.clear_knowledge_base).grid(row=0, column=2, padx=(10, 0))
+
         # 知识库文档列表
-        list_frame = ttk.LabelFrame(main_frame, text="📋 知识库文档", padding="5")
-        list_frame.grid(row=1, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
-        
-        self.doc_listbox = tk.Listbox(list_frame, height=3, font=("Arial", 9))
-        self.doc_listbox.pack(fill=tk.BOTH, expand=True)
+        list_label = ttk.Label(doc_frame, text="📋 知识库文档:")
+        list_label.grid(row=1, column=0, sticky=tk.W, pady=(5, 2))
+
+        # 创建列表框和滚动条
+        list_container = ttk.Frame(doc_frame)
+        list_container.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 5))
+        list_container.columnconfigure(0, weight=1)
+
+        self.doc_listbox = tk.Listbox(list_container, height=4, font=("Arial", 9))
+        self.doc_listbox.grid(row=0, column=0, sticky=(tk.W, tk.E))
+
+        # 添加滚动条
+        scrollbar = ttk.Scrollbar(list_container, orient="vertical", command=self.doc_listbox.yview)
+        scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
+        self.doc_listbox.configure(yscrollcommand=scrollbar.set)
         
         # 查询区域
-        query_frame = ttk.LabelFrame(main_frame, text="🤖 智能问答", padding="5")
-        query_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
+        query_frame = ttk.LabelFrame(main_frame, text="🤖 智能问答", padding="10")
+        query_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
         query_frame.columnconfigure(0, weight=1)
-        query_frame.rowconfigure(1, weight=1)
+        query_frame.rowconfigure(2, weight=1)
         
         # 问题输入
         input_frame = ttk.Frame(query_frame)
@@ -138,20 +153,20 @@ class RAGApplication:
                        variable=self.enable_voice_output).grid(row=0, column=1, padx=(10, 0))
         
         # 回答显示区域
-        self.answer_text = scrolledtext.ScrolledText(query_frame, 
+        self.answer_text = scrolledtext.ScrolledText(query_frame,
                                                     font=self.font,
                                                     wrap=tk.WORD,
                                                     height=15)
-        self.answer_text.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(5, 0))
+        self.answer_text.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
         
         # 状态栏
         status_frame = ttk.Frame(main_frame)
-        status_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E))
+        status_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
         status_frame.columnconfigure(0, weight=1)
-        
+
         self.status_label = ttk.Label(status_frame, text="就绪")
         self.status_label.grid(row=0, column=0, sticky=tk.W)
-        
+
         ttk.Button(status_frame, text="🖥️ 系统信息", command=self.show_system_info).grid(row=0, column=1, padx=(5, 0))
         
         # 初始化状态
@@ -231,10 +246,14 @@ class RAGApplication:
             messagebox.showwarning("警告", "语音功能不可用，请检查语音依赖安装")
             return
 
+        # 播放欢迎语音
+        self.voice_handler.speak_text("欢迎使用语音功能，请开始说话", async_mode=False)
+
         # 显示语音输入状态
         original_text = self.question_entry.get()
         self.question_entry.delete(0, tk.END)
-        self.question_entry.insert(0, "🎤 正在监听...")
+        self.question_entry.insert(0, "🎤 正在监听，请说话...")
+        self.voice_btn.config(text="🔴 监听中", state="disabled")
         self.root.update()
 
         def voice_recognition():
@@ -244,20 +263,26 @@ class RAGApplication:
 
                 # 在主线程中更新UI
                 def update_ui():
+                    self.voice_btn.config(text="🎤 语音", state="normal")
                     self.question_entry.delete(0, tk.END)
-                    if text:
+                    if text and text.strip():
                         self.question_entry.insert(0, text)
-                        messagebox.showinfo("语音识别", f"识别结果：{text}")
+                        # 播放确认语音
+                        self.voice_handler.speak_text(f"识别到：{text}", async_mode=True)
+                        messagebox.showinfo("语音识别成功", f"识别结果：{text}")
                     else:
                         self.question_entry.insert(0, original_text)
+                        self.voice_handler.speak_text("未能识别到语音内容，请重试", async_mode=True)
                         messagebox.showwarning("语音识别", "未能识别到语音内容，请重试")
 
                 self.root.after(0, update_ui)
 
             except Exception as e:
                 def show_error():
+                    self.voice_btn.config(text="🎤 语音", state="normal")
                     self.question_entry.delete(0, tk.END)
                     self.question_entry.insert(0, original_text)
+                    self.voice_handler.speak_text("语音识别失败，请重试", async_mode=True)
                     messagebox.showerror("错误", f"语音识别失败：{str(e)}")
 
                 self.root.after(0, show_error)

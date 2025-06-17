@@ -188,20 +188,41 @@ class VoiceHandler:
         """
         try:
             self.is_speaking = True
-            self.logger.info(f"开始播报: {text[:50]}...")
 
-            # 检查音频设备
-            self.logger.debug(f"TTS引擎状态: {self.tts_engine}")
-            self.logger.debug(f"音量设置: {self.tts_engine.getProperty('volume')}")
-            self.logger.debug(f"语音速度: {self.tts_engine.getProperty('rate')}")
+            # 清理文本，避免特殊字符导致问题
+            clean_text = text.strip()
+            if not clean_text:
+                return False
 
-            # 确保音量不为0
-            current_volume = self.tts_engine.getProperty('volume')
-            if current_volume < 0.1:
-                self.tts_engine.setProperty('volume', 0.8)
-                self.logger.info("音量过低，已调整到0.8")
+            self.logger.info(f"开始播报: {clean_text[:50]}...")
 
-            self.tts_engine.say(text)
+            # 设置合适的语音参数，避免怪音
+            try:
+                # 设置语速（较慢，避免怪音）
+                self.tts_engine.setProperty('rate', 120)
+
+                # 设置音量（适中）
+                self.tts_engine.setProperty('volume', 0.7)
+
+                # 尝试设置中文语音
+                voices = self.tts_engine.getProperty('voices')
+                if voices:
+                    # 寻找中文语音
+                    chinese_voice = None
+                    for voice in voices:
+                        if 'zh' in voice.id.lower() or 'chinese' in voice.name.lower():
+                            chinese_voice = voice.id
+                            break
+
+                    if chinese_voice:
+                        self.tts_engine.setProperty('voice', chinese_voice)
+                        self.logger.debug(f"使用中文语音: {chinese_voice}")
+
+            except Exception as e:
+                self.logger.warning(f"设置语音参数失败: {e}")
+
+            # 播报语音
+            self.tts_engine.say(clean_text)
             self.tts_engine.runAndWait()
 
             self.logger.info("语音播报完成")
